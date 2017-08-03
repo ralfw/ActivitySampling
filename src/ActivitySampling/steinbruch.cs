@@ -6,12 +6,12 @@ using MonoMac.Foundation;
 
 namespace ActivitySampling
 {
-public class MainForm : Form
+    public class steinbruch : Form
     {
         UITimer timer = new UITimer();
         UITimer tick = new UITimer();
 
-        public MainForm()
+        public steinbruch()
         {
             Title = "Activity Tracker i1";
             ClientSize = new Size(180, 250);
@@ -81,12 +81,13 @@ public class MainForm : Form
 
                 // dont add this for ever click!!!!
                 var logFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/activitysampling.log";
-                center.DidActivateNotification += (object _sender, UNCDidActivateNotificationEventArgs _eargs) => 
+                center.DidActivateNotification += (object _sender, UNCDidActivateNotificationEventArgs _eargs) =>
                 {
                     File.AppendAllText(logFilePath, $"activated @ {DateTime.Now:s}\n");
                     //this.WindowState = WindowState.Normal;
                 };
-                center.DidDeliverNotification += (object _sender, UNCDidDeliverNotificationEventArgs _eargs) => {
+                center.DidDeliverNotification += (object _sender, UNCDidDeliverNotificationEventArgs _eargs) =>
+                {
                     File.AppendAllText(logFilePath, $"delivered @ {DateTime.Now:s}\n");
                 };
 

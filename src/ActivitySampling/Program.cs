@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Eto.Forms;
+
 
 namespace ActivitySampling
 {
@@ -8,7 +12,21 @@ namespace ActivitySampling
         public static void Main(string[] args)
         {
             var app = new Application();
-            app.Run(new MainForm());
+
+            var applicationDataFolderPath = Ensure_application_data_folder();
+            Logging.Initialize(applicationDataFolderPath);
+            var reqHandler = new RequestHandler(applicationDataFolderPath);
+            var mainDlg = new MainDlg(reqHandler);
+
+            app.Run(mainDlg);
+        }
+
+
+        static string Ensure_application_data_folder() {
+            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                      "ActivitySampling");
+            Directory.CreateDirectory(folder);
+            return folder;
         }
     }
 }

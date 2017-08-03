@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActivitySampling", "ActivitySampling\ActivitySampling.csproj", "{2668CDEA-7074-4DE5-838A-80462A390193}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ActivitySampling.Tests", "ActivitySampling.Tests\ActivitySampling.Tests.csproj", "{7B64354B-384D-4650-B0B4-3B685C6E8980}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,5 +15,9 @@ Global
 		{2668CDEA-7074-4DE5-838A-80462A390193}.Debug|x86.Build.0 = Debug|x86
 		{2668CDEA-7074-4DE5-838A-80462A390193}.Release|x86.ActiveCfg = Release|x86
 		{2668CDEA-7074-4DE5-838A-80462A390193}.Release|x86.Build.0 = Release|x86
+		{7B64354B-384D-4650-B0B4-3B685C6E8980}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7B64354B-384D-4650-B0B4-3B685C6E8980}.Debug|x86.Build.0 = Debug|Any CPU
+		{7B64354B-384D-4650-B0B4-3B685C6E8980}.Release|x86.ActiveCfg = Release|Any CPU
+		{7B64354B-384D-4650-B0B4-3B685C6E8980}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
