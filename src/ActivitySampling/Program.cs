@@ -18,6 +18,9 @@ namespace ActivitySampling
             var reqHandler = new RequestHandler(applicationDataFolderPath);
             var mainDlg = new MainDlg(reqHandler);
 
+            var activities = reqHandler.Select_activities();
+            mainDlg.Display(activities);
+
             app.Run(mainDlg);
         }
 

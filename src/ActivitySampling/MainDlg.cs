@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Eto.Drawing;
 using Eto.Forms;
 using MonoMac.Foundation;
@@ -9,6 +11,8 @@ namespace ActivitySampling
     class MainDlg : Form
     {
         readonly RequestHandler reqHandler;
+
+        ListBox lstActivityLog;
 
 
         void Setup_menu() {
@@ -28,17 +32,18 @@ namespace ActivitySampling
         }
 
 
+
         void Setup_content() {
             Title = "Activity Log";
-            ClientSize = new Size(180, 250);
+            ClientSize = new Size(250, 350);
 
             var txtActivity = new TextBox();
-            var lstActivityLog = new ListBox();
+            this.lstActivityLog = new ListBox();
             var btnLogActivity = new Button { Text = "Log" };
 
             btnLogActivity.Click += (sender, e) => {
                 this.reqHandler.Log_activity(txtActivity.Text);
-                lstActivityLog.Items.Insert(0, new ListItem{Text = $"{DateTime.Now:t}: {txtActivity.Text}"});
+                lstActivityLog.Items.Insert(0, new ListItem{Text = Format_log_entry(txtActivity.Text, DateTime.Now)});
             };
 
 
@@ -66,5 +71,19 @@ namespace ActivitySampling
             Setup_menu();
             Setup_content();
         }
+
+
+        public void Display(IEnumerable<ActivityDto> activities)
+        {
+            var groupedByDay = activities.GroupBy(a => a.Timestamp.ToString("yyyyMMdd"));
+            foreach(var g in groupedByDay.Reverse()) {
+                this.lstActivityLog.Items.Add(g.First().Timestamp.ToString("D"));
+                foreach (var a in g.Reverse())
+                    this.lstActivityLog.Items.Add(Format_log_entry(a.Description,a.Timestamp));
+            }
+
+        }
+
+        string Format_log_entry(string description, DateTime timestamp) => $"{timestamp:t} - {description}";
     }
 }
