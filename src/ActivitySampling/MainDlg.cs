@@ -11,13 +11,17 @@ namespace ActivitySampling
 {
     class MainDlg : Form
     {
-        const int INTERVAL_LENGTH_SECONDS = 30 * 60;
+        const int INTERVAL_LENGTH_SECONDS = 10 * 60;
         readonly RequestHandler reqHandler;
 
 
         TextBox txtActivity;
         ListBox lstActivityLog;
 
+        UITimer timProgress;
+        Label lblProgress;
+        ProgressBar progressbar;
+        TimeSpan countdown;
 
         Command cmdStart;
         Command cmdStop;
@@ -29,6 +33,7 @@ namespace ActivitySampling
             this.notificationCenter.RemoveScheduledNotification(this.notification);
             this.cmdStart.Enabled = true;
             this.cmdStop.Enabled = !this.cmdStart.Enabled;
+            this.timProgress.Stop();
         }
 
 
@@ -42,6 +47,11 @@ namespace ActivitySampling
 
             this.cmdStart.Enabled = false;
             this.cmdStop.Enabled = !this.cmdStart.Enabled;
+
+            this.progressbar.Value = 0;
+            this.progressbar.MaxValue = INTERVAL_LENGTH_SECONDS;
+            this.countdown = TimeSpan.FromSeconds(INTERVAL_LENGTH_SECONDS);
+            this.timProgress.Start();
         }
         
         void notification_delivered(object sender, EventArgs e) {
@@ -107,20 +117,33 @@ namespace ActivitySampling
             this.notificationCenter.DidActivateNotification += notification_clicked;
             this.notificationCenter.ShouldPresentNotification += (_c, _n) => true; // always notify!
 
+            this.timProgress = new UITimer { Interval = 1.0 }; 
+            this.timProgress.Elapsed += (sender, e) => {
+                this.progressbar.Value += 1;
+                this.countdown = this.countdown.Subtract(TimeSpan.FromSeconds(1));
+                this.lblProgress.Text = this.countdown.ToString();
+            };
+            this.countdown = TimeSpan.FromSeconds(0);
+            this.lblProgress = new Label { Text = this.countdown.ToString(), TextAlignment = TextAlignment.Center, Height = 13 };
+            this.progressbar = new ProgressBar { Height = 10 };
+
+
             var layout = new TableLayout
             {
-                Padding = new Padding(5), // padding around cells
+                Padding = new Padding(10), // padding around cells
                 Spacing = new Size(5, 5), // spacing between each cell
 
                 Rows = {
                     new TableRow(new Label{Text="Activity:"}),
-                    new TableRow(txtActivity),
+                    new TableRow(this.txtActivity),
                     new TableRow(btnLogActivity),
-                    new TableRow(lstActivityLog)
+                    new TableRow(this.lblProgress),
+                    new TableRow(this.progressbar),
+                    new TableRow(this.lstActivityLog)
                 }
             };
-
             Content = layout;
+
 
             this.UnLoad += (sender, e) => {
                 this.notificationCenter.RemoveScheduledNotification(this.notification);
