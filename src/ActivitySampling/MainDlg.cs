@@ -14,19 +14,22 @@ namespace ActivitySampling
         readonly RequestHandler reqHandler;
 
 
+        TextBox txtActivity;
         ListBox lstActivityLog;
 
 
-        Button btnNotification;
+        Command cmdStart;
+        Command cmdStop;
 
-        void btnNotification_clicked(object sender, EventArgs e) {
-            if (this.btnNotification.Text == "Start") {
-                Schedule_notification();
-            }
-            else {
-                this.btnNotification.Text = "Start";
-                this.notificationCenter.RemoveScheduledNotification(this.notification);
-            }
+        void cmdStart_clicked(object sender, EventArgs e) {
+            Schedule_notification();
+            this.cmdStart.Enabled = false;
+            this.cmdStop.Enabled = !this.cmdStart.Enabled;
+        }
+        void cmdStop_clicked(object sender, EventArgs e) {
+            this.notificationCenter.RemoveScheduledNotification(this.notification);
+            this.cmdStart.Enabled = true;
+            this.cmdStop.Enabled = !this.cmdStart.Enabled;
         }
 
 
@@ -34,7 +37,7 @@ namespace ActivitySampling
         NSUserNotificationCenter notificationCenter;
 
         void Schedule_notification() {
-            this.btnNotification.Text = "Stop";
+            this.cmdStart.MenuText = "Stop";
             this.notificationCenter.RemoveAllDeliveredNotifications();
             this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(10));
             this.notificationCenter.ScheduleNotification(this.notification);
@@ -48,6 +51,7 @@ namespace ActivitySampling
         void notification_clicked(object sender, EventArgs e) {
             Logging.Log.Append("clicked");
             this.WindowState = WindowState.Normal;
+            this.txtActivity.Focus();
         }
 
 
@@ -61,14 +65,19 @@ namespace ActivitySampling
 
             var preferencesCommand = new Command { MenuText = "&Preferences...", Shortcut = Application.Instance.CommonModifier | Keys.Comma };
 
+            this.cmdStart = new Command { MenuText = "Start", Shortcut = Application.Instance.CommonModifier | Keys.S, Enabled = false};
+            this.cmdStart.Executed += cmdStart_clicked;
+            this.cmdStop = new Command { MenuText = "Stop", Shortcut = Application.Instance.CommonModifier | Keys.T };
+            this.cmdStop.Executed += cmdStop_clicked;
+
             Menu = new MenuBar() {
                 AboutItem = aboutCommand,
                 ApplicationItems = {  preferencesCommand },
-                QuitItem = quitCommand,
+                QuitItem = quitCommand
             };
+
+            Menu.Items.Insert(3, new ButtonMenuItem { Text = "Notifications", Items = { this.cmdStart, this.cmdStop } });
         }
-
-
 
 
         void Setup_content()
@@ -76,18 +85,12 @@ namespace ActivitySampling
             Title = "Activity Log";
             ClientSize = new Size(250, 350);
 
-            var txtActivity = new TextBox();
+            txtActivity = new TextBox();
             this.lstActivityLog = new ListBox();
             var btnLogActivity = new Button { Text = "Log" };
 
-            btnLogActivity.Click += (sender, e) => {
-                this.reqHandler.Log_activity(txtActivity.Text);
-                lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(txtActivity.Text, DateTime.Now) });
-            };
+            btnLogActivity.Click += (sender, e) => Log_activity(txtActivity.Text);
 
-
-            this.btnNotification = new Button { Text = "Start" };
-            this.btnNotification.Click += btnNotification_clicked;
             this.notification = new NSUserNotification { 
                 Title = "What's your focus right now?",
                 Subtitle = "",
@@ -105,7 +108,6 @@ namespace ActivitySampling
                 Spacing = new Size(5, 5), // spacing between each cell
 
                 Rows = {
-                    new TableRow(this.btnNotification),
                     new TableRow(new Label{Text="Activity:"}),
                     new TableRow(txtActivity),
                     new TableRow(btnLogActivity),
@@ -114,6 +116,10 @@ namespace ActivitySampling
             };
 
             Content = layout;
+
+            this.UnLoad += (sender, e) => {
+                this.notificationCenter.RemoveScheduledNotification(this.notification);
+            };
         }
 
 
@@ -125,6 +131,14 @@ namespace ActivitySampling
             Setup_content();
 
             Schedule_notification();
+        }
+
+
+        public void Log_activity(string description) {
+            this.reqHandler.Log_activity(description);
+
+            this.txtActivity.Text = description;
+            this.lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(txtActivity.Text, DateTime.Now) });
         }
 
 
