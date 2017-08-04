@@ -11,11 +11,11 @@ namespace ActivitySampling
 {
     class MainDlg : Form
     {
-        const int DEFAUL_INTERVAL_LENGTH_SEC = 30 * 60;
+        const int DEFAULT_INTERVAL_LENGTH_SEC = 30 * 60;
 
         readonly RequestHandler reqHandler;
 
-        int interval_length_sec = DEFAUL_INTERVAL_LENGTH_SEC;
+        int interval_length_sec = DEFAULT_INTERVAL_LENGTH_SEC;
 
 
         TextBox txtActivity;
