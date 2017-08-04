@@ -6,6 +6,7 @@ using Eto.Drawing;
 using Eto.Forms;
 using MonoMac.Foundation;
 
+
 namespace ActivitySampling
 {
     class MainDlg : Form
@@ -13,6 +14,38 @@ namespace ActivitySampling
         readonly RequestHandler reqHandler;
 
         ListBox lstActivityLog;
+
+
+        Button btnNotification;
+        void btnNotification_clicked(object sender, EventArgs e) {
+            if (this.btnNotification.Text == "Start") {
+                this.btnNotification.Text = "Stop";
+                this.timNotification.Start();
+            }
+            else {
+                this.btnNotification.Text = "Start";
+                this.timNotification.Stop();
+            }
+        }
+
+
+        UITimer timNotification;
+        NSUserNotification notification;
+        NSUserNotificationCenter notificationCenter;
+
+        void timNotification_elapsed(object sender, EventArgs e) {
+            this.notificationCenter.DeliverNotification(this.notification);
+            this.notificationCenter.RemoveAllDeliveredNotifications();
+        }
+
+        void notification_delivered(object sender, EventArgs e) {
+            Logging.Log.Append("delivered");
+        }
+
+        void notification_clicked(object sender, EventArgs e) {
+            Logging.Log.Append("clicked");
+            this.WindowState = WindowState.Normal;
+        }
 
 
         void Setup_menu() {
@@ -33,7 +66,9 @@ namespace ActivitySampling
 
 
 
-        void Setup_content() {
+
+        void Setup_content()
+        {
             Title = "Activity Log";
             ClientSize = new Size(250, 350);
 
@@ -43,9 +78,24 @@ namespace ActivitySampling
 
             btnLogActivity.Click += (sender, e) => {
                 this.reqHandler.Log_activity(txtActivity.Text);
-                lstActivityLog.Items.Insert(0, new ListItem{Text = Format_log_entry(txtActivity.Text, DateTime.Now)});
+                lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(txtActivity.Text, DateTime.Now) });
             };
 
+
+            this.btnNotification = new Button { Text = "Start" };
+            this.btnNotification.Click += btnNotification_clicked;
+            this.timNotification = new UITimer { Interval = 10 };
+            this.timNotification.Elapsed += timNotification_elapsed;
+            this.notification = new NSUserNotification { 
+                Title = "What's your focus right now?",
+                Subtitle = "",
+                InformativeText = "Click to enter an activity...",
+                SoundName = NSUserNotification.NSUserNotificationDefaultSoundName
+            };
+            this.notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
+            this.notificationCenter.DidDeliverNotification += notification_delivered;
+            this.notificationCenter.DidActivateNotification += notification_clicked;
+            this.notificationCenter.ShouldPresentNotification += (_c, _n) => true; // always notify!
 
             var layout = new TableLayout
             {
@@ -53,6 +103,7 @@ namespace ActivitySampling
                 Spacing = new Size(5, 5), // spacing between each cell
 
                 Rows = {
+                    new TableRow(this.btnNotification),
                     new TableRow(new Label{Text="Activity:"}),
                     new TableRow(txtActivity),
                     new TableRow(btnLogActivity),
