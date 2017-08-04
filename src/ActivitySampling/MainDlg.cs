@@ -11,6 +11,7 @@ namespace ActivitySampling
 {
     class MainDlg : Form
     {
+        const int INTERVAL_LENGTH_SECONDS = 30 * 60;
         readonly RequestHandler reqHandler;
 
 
@@ -23,8 +24,6 @@ namespace ActivitySampling
 
         void cmdStart_clicked(object sender, EventArgs e) {
             Schedule_notification();
-            this.cmdStart.Enabled = false;
-            this.cmdStop.Enabled = !this.cmdStart.Enabled;
         }
         void cmdStop_clicked(object sender, EventArgs e) {
             this.notificationCenter.RemoveScheduledNotification(this.notification);
@@ -37,23 +36,26 @@ namespace ActivitySampling
         NSUserNotificationCenter notificationCenter;
 
         void Schedule_notification() {
-            this.cmdStart.MenuText = "Stop";
             this.notificationCenter.RemoveAllDeliveredNotifications();
-            this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(10));
+            this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(INTERVAL_LENGTH_SECONDS));
             this.notificationCenter.ScheduleNotification(this.notification);
+
+            this.cmdStart.Enabled = false;
+            this.cmdStop.Enabled = !this.cmdStart.Enabled;
         }
         
         void notification_delivered(object sender, EventArgs e) {
-            Logging.Log.Append("delivered");
             Schedule_notification();
         }
 
         void notification_clicked(object sender, EventArgs e) {
-            Logging.Log.Append("clicked");
-            this.WindowState = WindowState.Normal;
-            this.txtActivity.Focus();
+            if (this.txtActivity.Text != "")
+                Log_activity(this.txtActivity.Text);
+            else {
+                this.WindowState = WindowState.Normal;
+                this.txtActivity.Focus();
+            }
         }
-
 
 
         void Setup_menu() {
@@ -89,12 +91,15 @@ namespace ActivitySampling
             this.lstActivityLog = new ListBox();
             var btnLogActivity = new Button { Text = "Log" };
 
-            btnLogActivity.Click += (sender, e) => Log_activity(txtActivity.Text);
+            btnLogActivity.Click += (sender, e) => {
+                Log_activity(txtActivity.Text);
+                Logging.Log.Append("Activity changed to: " + txtActivity.Text);
+            };
 
             this.notification = new NSUserNotification { 
-                Title = "What's your focus right now?",
+                Title = "What are you working on?",
                 Subtitle = "",
-                InformativeText = "Click to enter an activity...",
+                InformativeText = "Click for same activity as before. Open window to change it.",
                 SoundName = NSUserNotification.NSUserNotificationDefaultSoundName
             };
             this.notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
@@ -144,13 +149,12 @@ namespace ActivitySampling
 
         public void Display(IEnumerable<ActivityDto> activities)
         {
-            var groupedByDay = activities.GroupBy(a => a.Timestamp.ToString("yyyyMMdd"));
-            foreach(var g in groupedByDay.Reverse()) {
+            var groupedByDay = activities.GroupBy(a => a.Timestamp.ToString("yyyyMMdd")).Reverse();
+            foreach(var g in groupedByDay) {
                 this.lstActivityLog.Items.Add(g.First().Timestamp.ToString("D"));
                 foreach (var a in g.Reverse())
                     this.lstActivityLog.Items.Add(Format_log_entry(a.Description,a.Timestamp));
             }
-
         }
 
         string Format_log_entry(string description, DateTime timestamp) => $"{timestamp:t} - {description}";

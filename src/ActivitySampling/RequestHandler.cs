@@ -11,7 +11,7 @@ namespace ActivitySampling
 
         public RequestHandler(string applicationDataFolderPath) {
             this.activityLog = new ActivityLog(applicationDataFolderPath);
-            this.activityLog.Append(new ActivityDto { Description = "***started***", Timestamp = DateTime.Now });
+            Logging.Log.Append("Request handler started");
         }
 
 
