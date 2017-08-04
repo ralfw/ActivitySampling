@@ -13,39 +13,43 @@ namespace ActivitySampling
     {
         readonly RequestHandler reqHandler;
 
+
         ListBox lstActivityLog;
 
 
         Button btnNotification;
+
         void btnNotification_clicked(object sender, EventArgs e) {
             if (this.btnNotification.Text == "Start") {
-                this.btnNotification.Text = "Stop";
-                this.timNotification.Start();
+                Schedule_notification();
             }
             else {
                 this.btnNotification.Text = "Start";
-                this.timNotification.Stop();
+                this.notificationCenter.RemoveScheduledNotification(this.notification);
             }
         }
 
 
-        UITimer timNotification;
         NSUserNotification notification;
         NSUserNotificationCenter notificationCenter;
 
-        void timNotification_elapsed(object sender, EventArgs e) {
-            this.notificationCenter.DeliverNotification(this.notification);
+        void Schedule_notification() {
+            this.btnNotification.Text = "Stop";
             this.notificationCenter.RemoveAllDeliveredNotifications();
+            this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(10));
+            this.notificationCenter.ScheduleNotification(this.notification);
         }
-
+        
         void notification_delivered(object sender, EventArgs e) {
             Logging.Log.Append("delivered");
+            Schedule_notification();
         }
 
         void notification_clicked(object sender, EventArgs e) {
             Logging.Log.Append("clicked");
             this.WindowState = WindowState.Normal;
         }
+
 
 
         void Setup_menu() {
@@ -84,8 +88,6 @@ namespace ActivitySampling
 
             this.btnNotification = new Button { Text = "Start" };
             this.btnNotification.Click += btnNotification_clicked;
-            this.timNotification = new UITimer { Interval = 10 };
-            this.timNotification.Elapsed += timNotification_elapsed;
             this.notification = new NSUserNotification { 
                 Title = "What's your focus right now?",
                 Subtitle = "",
@@ -121,6 +123,8 @@ namespace ActivitySampling
 
             Setup_menu();
             Setup_content();
+
+            Schedule_notification();
         }
 
 
