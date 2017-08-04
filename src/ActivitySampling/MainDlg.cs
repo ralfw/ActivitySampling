@@ -11,8 +11,11 @@ namespace ActivitySampling
 {
     class MainDlg : Form
     {
-        const int INTERVAL_LENGTH_SECONDS = 10 * 60;
+        const int DEFAUL_INTERVAL_LENGTH_SEC = 30 * 60;
+
         readonly RequestHandler reqHandler;
+
+        int interval_length_sec = DEFAUL_INTERVAL_LENGTH_SEC;
 
 
         TextBox txtActivity;
@@ -41,16 +44,18 @@ namespace ActivitySampling
         NSUserNotificationCenter notificationCenter;
 
         void Schedule_notification() {
+            this.notificationCenter.RemoveScheduledNotification(this.notification);
             this.notificationCenter.RemoveAllDeliveredNotifications();
-            this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(INTERVAL_LENGTH_SECONDS));
+
+            this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(this.interval_length_sec));
             this.notificationCenter.ScheduleNotification(this.notification);
 
             this.cmdStart.Enabled = false;
             this.cmdStop.Enabled = !this.cmdStart.Enabled;
 
             this.progressbar.Value = 0;
-            this.progressbar.MaxValue = INTERVAL_LENGTH_SECONDS;
-            this.countdown = TimeSpan.FromSeconds(INTERVAL_LENGTH_SECONDS);
+            this.progressbar.MaxValue = this.interval_length_sec;
+            this.countdown = TimeSpan.FromSeconds(this.interval_length_sec);
             this.timProgress.Start();
         }
         
@@ -68,6 +73,14 @@ namespace ActivitySampling
         }
 
 
+        void mnuInterval_selected(object sender, EventArgs e) {
+            var mnu = (MenuItem)sender;
+            var min = int.Parse(mnu.Text.Split(' ')[0]);
+            this.interval_length_sec = min * 60;
+            if (this.cmdStop.Enabled) Schedule_notification();
+        }
+
+
         void Setup_menu() {
             var aboutCommand = new Command { MenuText = "About..." };
             aboutCommand.Executed += (sender, e) => MessageBox.Show(this, "Activity Sampling v0.1");
@@ -82,13 +95,27 @@ namespace ActivitySampling
             this.cmdStop = new Command { MenuText = "Stop", Shortcut = Application.Instance.CommonModifier | Keys.T };
             this.cmdStop.Executed += cmdStop_clicked;
 
+            var mnuIntervals = new ButtonMenuItem { Text = "Intervals", Items = { 
+                    new Command{MenuText = "15 min"},
+                    new Command{MenuText = "25 min"},
+                    new Command{MenuText = "30 min"},
+                    new Command{MenuText = "60 min"},
+                    new Command{MenuText = "90 min"},
+                    new Command{MenuText = "120 min"}
+                } };
+            foreach(var item in mnuIntervals.Items)
+            {
+                item.Click += mnuInterval_selected;
+            }
+
+
             Menu = new MenuBar() {
                 AboutItem = aboutCommand,
-                ApplicationItems = {  preferencesCommand },
+                //ApplicationItems = {  preferencesCommand },
                 QuitItem = quitCommand
             };
 
-            Menu.Items.Insert(3, new ButtonMenuItem { Text = "Notifications", Items = { this.cmdStart, this.cmdStop } });
+            Menu.Items.Insert(3, new ButtonMenuItem { Text = "Notifications", Items = { this.cmdStart, this.cmdStop, mnuIntervals } });
         }
 
 
@@ -102,6 +129,7 @@ namespace ActivitySampling
             var btnLogActivity = new Button { Text = "Log" };
 
             btnLogActivity.Click += (sender, e) => {
+                if (txtActivity.Text == "") return;
                 Log_activity(txtActivity.Text);
                 Logging.Log.Append("Activity changed to: " + txtActivity.Text);
             };
