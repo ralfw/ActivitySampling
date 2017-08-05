@@ -56,6 +56,7 @@
     <Compile Include="adapters\MainDlg.cs" />
     <Compile Include="adapters\ActivityLog.cs" />
     <Compile Include="adapters\Logging.cs" />
+    <Compile Include="adapters\Notifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,17 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Eto.Drawing;
 using Eto.Forms;
-using MonoMac.Foundation;
 
 
 namespace ActivitySampling
 {
     class MainDlg : Form
     {
-        const int DEFAULT_INTERVAL_LENGTH_SEC = 30 * 60;
+        public event Action<string> Activity_loggged;
+        public event Action<TimeSpan> Notifications_requested;
+        public event Action Stop_notifications_requested;
+        public event Action<string> Activity_changed;
+
+        public void Start_countdown(TimeSpan countdown) {
+            
+        }
+
+        public void Log_activity(string description) {
+            
+        }
+
+
+        const int DEFAULT_INTERVAL_LENGTH_SEC = 5 * 60;
 
         readonly RequestHandler reqHandler;
 
@@ -21,10 +33,8 @@ namespace ActivitySampling
         TextBox txtActivity;
         ListBox lstActivityLog;
 
-        UITimer timProgress;
         Label lblProgress;
         ProgressBar progressbar;
-        TimeSpan countdown;
 
         Command cmdStart;
         Command cmdStop;
@@ -33,43 +43,8 @@ namespace ActivitySampling
             Schedule_notification();
         }
         void cmdStop_clicked(object sender, EventArgs e) {
-            this.notificationCenter.RemoveScheduledNotification(this.notification);
             this.cmdStart.Enabled = true;
             this.cmdStop.Enabled = !this.cmdStart.Enabled;
-            this.timProgress.Stop();
-        }
-
-
-        NSUserNotification notification;
-        NSUserNotificationCenter notificationCenter;
-
-        void Schedule_notification() {
-            this.notificationCenter.RemoveScheduledNotification(this.notification);
-            this.notificationCenter.RemoveAllDeliveredNotifications();
-
-            this.notification.DeliveryDate = DateTime.Now.Add(TimeSpan.FromSeconds(this.interval_length_sec));
-            this.notificationCenter.ScheduleNotification(this.notification);
-
-            this.cmdStart.Enabled = false;
-            this.cmdStop.Enabled = !this.cmdStart.Enabled;
-
-            this.progressbar.Value = 0;
-            this.progressbar.MaxValue = this.interval_length_sec;
-            this.countdown = TimeSpan.FromSeconds(this.interval_length_sec);
-            this.timProgress.Start();
-        }
-        
-        void notification_delivered(object sender, EventArgs e) {
-            Schedule_notification();
-        }
-
-        void notification_clicked(object sender, EventArgs e) {
-            if (this.txtActivity.Text != "")
-                Log_activity(this.txtActivity.Text);
-            else {
-                this.WindowState = WindowState.Normal;
-                this.txtActivity.Focus();
-            }
         }
 
 
@@ -95,7 +70,8 @@ namespace ActivitySampling
             this.cmdStop = new Command { MenuText = "Stop", Shortcut = Application.Instance.CommonModifier | Keys.T };
             this.cmdStop.Executed += cmdStop_clicked;
 
-            var mnuIntervals = new ButtonMenuItem { Text = "Intervals", Items = { 
+            var mnuIntervals = new ButtonMenuItem { Text = "Intervals", Items = {
+                    new Command{MenuText = "5 min"},
                     new Command{MenuText = "15 min"},
                     new Command{MenuText = "25 min"},
                     new Command{MenuText = "30 min"},
@@ -103,8 +79,7 @@ namespace ActivitySampling
                     new Command{MenuText = "90 min"},
                     new Command{MenuText = "120 min"}
                 } };
-            foreach(var item in mnuIntervals.Items)
-            {
+            foreach(var item in mnuIntervals.Items) {
                 item.Click += mnuInterval_selected;
             }
 
@@ -130,22 +105,12 @@ namespace ActivitySampling
 
             btnLogActivity.Click += (sender, e) => {
                 if (txtActivity.Text == "") return;
-                Log_activity(txtActivity.Text);
                 Logging.Log.Append("Activity changed to: " + txtActivity.Text);
+                this.txtActivity.Text = txtActivity.Text;
+                this.lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(txtActivity.Text, DateTime.Now) });
+                this.OnActivityLogged(txtActivity.Text);
             };
 
-            this.notification = new NSUserNotification { 
-                Title = "What are you working on?",
-                Subtitle = "",
-                InformativeText = "Click for same activity as before. Open window to change it.",
-                SoundName = NSUserNotification.NSUserNotificationDefaultSoundName
-            };
-            this.notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
-            this.notificationCenter.DidDeliverNotification += notification_delivered;
-            this.notificationCenter.DidActivateNotification += notification_clicked;
-            this.notificationCenter.ShouldPresentNotification += (_c, _n) => true; // always notify!
-
-            this.timProgress = new UITimer { Interval = 1.0 }; 
             this.timProgress.Elapsed += (sender, e) => {
                 this.progressbar.Value += 1;
                 this.countdown = this.countdown.Subtract(TimeSpan.FromSeconds(1));
@@ -171,30 +136,12 @@ namespace ActivitySampling
                 }
             };
             Content = layout;
-
-
-            this.UnLoad += (sender, e) => {
-                this.notificationCenter.RemoveScheduledNotification(this.notification);
-            };
         }
 
 
-        public MainDlg(RequestHandler reqHandler)
-        {
-            this.reqHandler = reqHandler;
-
+        public MainDlg() {
             Setup_menu();
             Setup_content();
-
-            Schedule_notification();
-        }
-
-
-        public void Log_activity(string description) {
-            this.reqHandler.Log_activity(description);
-
-            this.txtActivity.Text = description;
-            this.lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(txtActivity.Text, DateTime.Now) });
         }
 
 

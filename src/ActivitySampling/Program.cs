@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Eto.Forms;
 
 
@@ -11,17 +9,32 @@ namespace ActivitySampling
     {
         public static void Main(string[] args)
         {
+            // build
             var app = new Application();
 
             var applicationDataFolderPath = Ensure_application_data_folder();
             Logging.Initialize(applicationDataFolderPath);
             var reqHandler = new RequestHandler(applicationDataFolderPath);
-            var mainDlg = new MainDlg(reqHandler);
+            var notifier = new Notifier();
 
+            // bind
+            var mainDlg = new MainDlg();
+            mainDlg.Activity_loggged += reqHandler.Log_activity;
+            mainDlg.Notifications_requested += notifier.Start;
+            mainDlg.Stop_notifications_requested += notifier.Stop;
+            mainDlg.Activity_changed += description => notifier.Current_activity = description;
+
+            notifier.Notification_scheduled += mainDlg.Start_countdown;
+            notifier.Notification_presented += () => { };
+            notifier.Notification_acknowledged += mainDlg.Log_activity;
+
+            // run
             var activities = reqHandler.Select_activities();
             mainDlg.Display(activities);
 
             app.Run(mainDlg);
+
+            notifier.Dispose();
         }
 
 
