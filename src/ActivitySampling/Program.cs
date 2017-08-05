@@ -30,11 +30,14 @@ namespace ActivitySampling
             notifier.Notification_presented += () => { };
             notifier.Notification_acknowledged += mainDlg.Log_activity;
 
+            Logging.Log.Append("initialization complete");
+
             // run
             var activities = reqHandler.Select_activities();
-            Logging.Log.Append("1");
             mainDlg.Display(activities);
             notifier.Start(TimeSpan.FromMinutes(30));
+            Logging.Log.Append("running (almost)");
+
             app.Run(mainDlg);
 
             notifier.Dispose();

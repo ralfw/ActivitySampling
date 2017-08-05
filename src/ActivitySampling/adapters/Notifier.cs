@@ -51,11 +51,15 @@ namespace ActivitySampling
 
             this.countdown = deliverIn;
             this.timProgress.Start();
+
+            Logging.Log.Append($"notifications started with {deliverIn} interval");
         }
 
         public void Stop() {
             this.timNotify.Stop();
             this.timProgress.Stop();
+
+            Logging.Log.Append("notifications stopped");
         }
 
 
@@ -66,9 +70,9 @@ namespace ActivitySampling
             this.notification.Subtitle = this.Current_activity;
             this.notificationCenter.DeliverNotification(this.notification);
             this.notificationCenter.RemoveAllDeliveredNotifications();
+            Logging.Log.Append($"notification delivered");
 
             this.countdown = TimeSpan.FromSeconds(this.timNotify.Interval);
-
             this.Notification_scheduled(TimeSpan.FromSeconds(this.timNotify.Interval));
         }
 

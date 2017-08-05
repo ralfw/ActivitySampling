@@ -42,7 +42,7 @@ namespace ActivitySampling
         void Setup_menu()
         {
             var aboutCommand = new Command { MenuText = "About..." };
-            aboutCommand.Executed += (sender, e) => MessageBox.Show(this, "Activity Sampling v0.2");
+            aboutCommand.Executed += (sender, e) => MessageBox.Show(this, "Activity Sampling v1.0");
 
             var quitCommand = new Command { MenuText = "Quit", Shortcut = Application.Instance.CommonModifier | Keys.Q };
             quitCommand.Executed += (sender, e) => Application.Instance.Quit();
@@ -56,14 +56,17 @@ namespace ActivitySampling
             {
                 Text = "Start",
                 Items = {
-                    new Command{MenuText = "10 sec", CommandParameter = 10 },
-                    new Command{MenuText = "5 min", CommandParameter = 5*60 },
-                    new Command{MenuText = "15 min", CommandParameter = 15*60 },
-                    new Command{MenuText = "25 min", CommandParameter = 25*60 },
-                    new Command{MenuText = "30 min", CommandParameter = 30*60 },
-                    new Command{MenuText = "60 min", CommandParameter = 60*60 },
-                    new Command{MenuText = "90 min", CommandParameter = 90*60 },
-                    new Command{MenuText = "120 min", CommandParameter = 120*60 }
+                    new Command{MenuText = "5 min",   CommandParameter = 5*60 },
+                    new Command{MenuText = "10 min",  CommandParameter = 10*60 },
+                    new Command{MenuText = "15 min",  CommandParameter = 15*60 },
+                    new Command{MenuText = "20 min",  CommandParameter = 20*60 },
+                    new Command{MenuText = "25 min",  CommandParameter = 25*60 },
+                    new Command{MenuText = "30 min",  CommandParameter = 30*60 },
+                    new Command{MenuText = "45 min",  CommandParameter = 45*60 },
+                    new Command{MenuText = "60 min",  CommandParameter = 60*60 },
+                    new Command{MenuText = "90 min",  CommandParameter = 90*60 },
+                    new Command{MenuText = "120 min", CommandParameter = 120*60 },
+                    new Command{MenuText = "10 sec",  CommandParameter = 10 }
                 }
             };
             foreach (var item in this.mnuStart.Items) {

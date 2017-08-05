@@ -9,7 +9,6 @@ namespace ActivitySampling
 
         public static void Initialize(string applicationDataFolderPath) {
             Log = new Logging(applicationDataFolderPath);
-            Log.Append("***initialized***");
         }
 
 
