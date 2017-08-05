@@ -25,6 +25,7 @@ namespace ActivitySampling
             mainDlg.Activity_changed += description => notifier.Current_activity = description;
 
             notifier.Notification_scheduled += mainDlg.Start_countdown;
+            notifier.Countdown += mainDlg.Update_countdown;
             notifier.Notification_presented += () => { };
             notifier.Notification_acknowledged += mainDlg.Log_activity;
 

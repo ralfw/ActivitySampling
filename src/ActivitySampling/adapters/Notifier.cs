@@ -6,6 +6,12 @@ namespace ActivitySampling
 {
     class Notifier : IDisposable
     {
+        public event Action<TimeSpan> Notification_scheduled;
+        public event Action<TimeSpan> Countdown;
+        public event Action Notification_presented;
+        public event Action<string> Notification_acknowledged;
+
+
         NSUserNotification notification;
         NSUserNotificationCenter notificationCenter;
 
@@ -29,6 +35,8 @@ namespace ActivitySampling
                 InformativeText = "Click for same activity as before.\nOr open window to change it.",
                 SoundName = NSUserNotification.NSUserNotificationDefaultSoundName
             };
+            this.Current_activity = "";
+
             this.notificationCenter = NSUserNotificationCenter.DefaultUserNotificationCenter;
             this.notificationCenter.ShouldPresentNotification += (_c, _n) => true; // always notify!
             this.notificationCenter.DidDeliverNotification += (_s, _e) => this.Notification_presented();
@@ -69,12 +77,6 @@ namespace ActivitySampling
 
 
         public string Current_activity { get; set; }
-
-
-        public event Action<TimeSpan> Notification_scheduled;
-        public event Action<TimeSpan> Countdown;
-        public event Action Notification_presented;
-        public event Action<string> Notification_acknowledged;
 
 
         public void Dispose()
