@@ -32,7 +32,7 @@ namespace ActivitySampling
             // run
             var activities = reqHandler.Select_activities();
             mainDlg.Display(activities);
-
+            notifier.Start(TimeSpan.FromMinutes(30));
             app.Run(mainDlg);
 
             notifier.Dispose();

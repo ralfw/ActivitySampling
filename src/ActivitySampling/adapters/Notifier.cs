@@ -28,8 +28,7 @@ namespace ActivitySampling
             this.timProgress = new UITimer { Interval = 1 };
             this.timProgress.Elapsed += timProgress_elapsed;
 
-            this.notification = new NSUserNotification
-            {
+            this.notification = new NSUserNotification {
                 Title = "What are you working on?",
                 Subtitle = "",
                 InformativeText = "Click for same activity as before.\nOr open window to change it.",
@@ -44,9 +43,10 @@ namespace ActivitySampling
         }
 
 
-        public void Start(TimeSpan deliverIn)
-        {
-            this.timNotify.Interval = deliverIn.Seconds;
+        public void Start(TimeSpan deliverIn) {
+            this.timNotify.Stop();
+
+            this.timNotify.Interval = deliverIn.TotalSeconds;
             this.timNotify.Start();
             this.Notification_scheduled(deliverIn);
 
@@ -54,18 +54,22 @@ namespace ActivitySampling
             this.timProgress.Start();
         }
 
-        public void Stop()
-        {
+        public void Stop() {
             this.timNotify.Stop();
             this.timProgress.Stop();
         }
 
 
-        void timNotify_elapsed(object s, EventArgs e)
-        {
+        public string Current_activity { get; set; }
+
+
+        void timNotify_elapsed(object s, EventArgs e) {
             this.notification.Subtitle = this.Current_activity;
             this.notificationCenter.DeliverNotification(this.notification);
             this.notificationCenter.RemoveAllDeliveredNotifications();
+
+            this.countdown = TimeSpan.FromSeconds(this.timNotify.Interval);
+
             this.Notification_scheduled(TimeSpan.FromSeconds(this.timNotify.Interval));
         }
 
@@ -74,9 +78,6 @@ namespace ActivitySampling
             this.countdown = this.countdown.Subtract(TimeSpan.FromSeconds(1));
             this.Countdown(this.countdown);
         }
-
-
-        public string Current_activity { get; set; }
 
 
         public void Dispose()
