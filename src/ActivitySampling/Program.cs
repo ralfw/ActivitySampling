@@ -14,6 +14,7 @@ namespace ActivitySampling
 
             var applicationDataFolderPath = Ensure_application_data_folder();
             Logging.Initialize(applicationDataFolderPath);
+
             var reqHandler = new RequestHandler(applicationDataFolderPath);
             var notifier = new Notifier();
 
@@ -31,6 +32,7 @@ namespace ActivitySampling
 
             // run
             var activities = reqHandler.Select_activities();
+            Logging.Log.Append("1");
             mainDlg.Display(activities);
             notifier.Start(TimeSpan.FromMinutes(30));
             app.Run(mainDlg);

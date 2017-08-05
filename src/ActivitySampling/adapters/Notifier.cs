@@ -20,8 +20,7 @@ namespace ActivitySampling
         TimeSpan countdown;
 
 
-        public Notifier()
-        {
+        public Notifier() {
             this.timNotify = new UITimer();
             this.timNotify.Elapsed += timNotify_elapsed;
 

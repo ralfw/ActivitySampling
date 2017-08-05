@@ -15,12 +15,6 @@ namespace ActivitySampling
         public event Action<string> Activity_changed;
 
 
-        const int DEFAULT_INTERVAL_LENGTH_SEC = 5 * 60;
-
-
-        int interval_length_sec = DEFAULT_INTERVAL_LENGTH_SEC;
-
-
         TextBox txtActivity;
         ListBox lstActivityLog;
 
@@ -31,15 +25,13 @@ namespace ActivitySampling
         ButtonMenuItem mnuStart;
         Command cmdStop;
 
-        void cmdStart_clicked(object sender, EventArgs e)
-        {
+        void cmdStart_clicked(object sender, EventArgs e) {
             var mnu = (MenuItem)sender;
-            this.interval_length_sec = (int)((Command)mnu.Command).CommandParameter;
-            this.Notifications_requested(TimeSpan.FromSeconds(this.interval_length_sec));
+            var interval_length_sec = (int)((Command)mnu.Command).CommandParameter;
+            this.Notifications_requested(TimeSpan.FromSeconds(interval_length_sec));
         }
 
-        void cmdStop_clicked(object sender, EventArgs e)
-        {
+        void cmdStop_clicked(object sender, EventArgs e) {
             this.Stop_notifications_requested();
 
             this.mnuStart.Enabled = true;
@@ -74,19 +66,15 @@ namespace ActivitySampling
                     new Command{MenuText = "120 min", CommandParameter = 120*60 }
                 }
             };
-            foreach (var item in this.mnuStart.Items)
-            {
+            foreach (var item in this.mnuStart.Items) {
                 item.Click += cmdStart_clicked;
             }
 
-
-            Menu = new MenuBar()
-            {
+            Menu = new MenuBar() {
                 AboutItem = aboutCommand,
                 //ApplicationItems = {  preferencesCommand },
                 QuitItem = quitCommand
             };
-
             Menu.Items.Insert(3, new ButtonMenuItem { Text = "Notifications", Items = { this.mnuStart, this.cmdStop } });
         }
 
@@ -97,13 +85,22 @@ namespace ActivitySampling
             ClientSize = new Size(250, 350);
 
             txtActivity = new TextBox();
-            this.lstActivityLog = new ListBox();
-            var btnLogActivity = new Button { Text = "Log" };
 
-            btnLogActivity.Click += (sender, e) =>
-            {
+            this.lstActivityLog = new ListBox();
+            this.lstActivityLog.MouseDoubleClick += (sender, e) => {
+                if (this.lstActivityLog.SelectedIndex >= 0) {
+                    var li = (ListItem)this.lstActivityLog.Items[this.lstActivityLog.SelectedIndex];
+                    if (li.Tag != null)
+                        this.txtActivity.Text = (string)li.Tag;
+                }
+            };
+
+            var btnLogActivity = new Button { Text = "Log" };
+            btnLogActivity.Click += (sender, e) => {
                 var description = this.txtActivity.Text;
+
                 Log_activity(description);
+
                 this.Activity_changed(description);
                 Logging.Log.Append("Activity changed to: " + description);
             };
@@ -111,9 +108,7 @@ namespace ActivitySampling
             this.lblProgress = new Label { Text = "00:00:00", TextAlignment = TextAlignment.Center, Height = 13 };
             this.progressbar = new ProgressBar { Height = 10 };
 
-
-            var layout = new TableLayout
-            {
+            var layout = new TableLayout {
                 Padding = new Padding(10), // padding around cells
                 Spacing = new Size(5, 5), // spacing between each cell
 
@@ -130,15 +125,13 @@ namespace ActivitySampling
         }
 
 
-        public MainDlg()
-        {
+        public MainDlg() {
             Setup_menu();
             Setup_content();
         }
 
 
-        public void Start_countdown(TimeSpan countdown)
-        {
+        public void Start_countdown(TimeSpan countdown) {
             this.mnuStart.Enabled = false;
             this.cmdStop.Enabled = !this.mnuStart.Enabled;
 
@@ -146,35 +139,34 @@ namespace ActivitySampling
             Update_countdown(countdown);
         }
 
-        public void Update_countdown(TimeSpan countdown)
-        {
+        public void Update_countdown(TimeSpan countdown) {
             this.progressbar.Value = (int)countdown.TotalSeconds;
             this.lblProgress.Text = countdown.ToString();
         }
 
 
-        public void Log_activity(string description)
-        {
+        public void Log_activity(string description) {
             if (description == "") {
                 this.WindowState = WindowState.Normal;
                 this.txtActivity.Focus();
             }
             else {
                 this.txtActivity.Text = description;
-                this.lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(description, DateTime.Now) });
+                this.lstActivityLog.Items.Insert(0, new ListItem { Text = Format_log_entry(description, DateTime.Now), Tag = description });
+
                 this.Activity_loggged(description);
             }
         }
 
 
-        public void Display(IEnumerable<ActivityDto> activities)
-        {
+        public void Display(IEnumerable<ActivityDto> activities) {
             var groupedByDay = activities.GroupBy(a => a.Timestamp.ToString("yyyyMMdd")).Reverse();
-            foreach (var g in groupedByDay)
-            {
+            foreach (var g in groupedByDay) {
                 this.lstActivityLog.Items.Add(g.First().Timestamp.ToString("D"));
-                foreach (var a in g.Reverse())
-                    this.lstActivityLog.Items.Add(Format_log_entry(a.Description, a.Timestamp));
+                foreach (var a in g.Reverse()) {
+                    var li = new ListItem { Text = Format_log_entry(a.Description, a.Timestamp), Tag = a.Description };
+                    this.lstActivityLog.Items.Add(li);
+                }
             }
 
             if (activities.Any()) {

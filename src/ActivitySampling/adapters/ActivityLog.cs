@@ -11,29 +11,24 @@ namespace ActivitySampling
 
         readonly string filepath;
 
-        public ActivityLog(string folderPath)
-        {
+        public ActivityLog(string folderPath) {
             this.filepath = Path.Combine(folderPath, LOG_FILENAME);
         }
 
-        public void Append(ActivityDto activity)
-        {
+        public void Append(ActivityDto activity) {
             var entry = $"{activity.Timestamp:s}\t{activity.Description}";
             File.AppendAllLines(this.filepath, new[] { entry });
         }
 
         public IEnumerable<ActivityDto> Activities
         {
-            get
-            {
+            get {
                 var entries = File.ReadAllLines(this.filepath);
-                return entries.Select(Parse_entry).ToArray();
+                return entries.Where(e => !string.IsNullOrWhiteSpace(e)).Select(Parse_entry).ToArray();
 
-                ActivityDto Parse_entry(string entry)
-                {
+                ActivityDto Parse_entry(string entry) {
                     var parts = entry.Split('\t');
-                    return new ActivityDto
-                    {
+                    return new ActivityDto {
                         Timestamp = DateTime.Parse(parts[0]),
                         Description = parts[1]
                     };
