@@ -15,28 +15,14 @@ namespace ActivitySampling
         public event Action<string> Activity_changed;
 
 
-        TextBox txtActivity;
-        ListBox lstActivityLog;
-
-        Label lblProgress;
-        ProgressBar progressbar;
-
-
         ButtonMenuItem mnuStart;
         Command cmdStop;
 
-        void cmdStart_clicked(object sender, EventArgs e) {
-            var mnu = (MenuItem)sender;
-            var interval_length_sec = (int)((Command)mnu.Command).CommandParameter;
-            this.Notifications_requested(TimeSpan.FromSeconds(interval_length_sec));
-        }
-
-        void cmdStop_clicked(object sender, EventArgs e) {
-            this.Stop_notifications_requested();
-
-            this.mnuStart.Enabled = true;
-            this.cmdStop.Enabled = !this.mnuStart.Enabled;
-        }
+        TextBox txtActivity;
+        Button btnLogActivity;
+        Label lblProgress;
+        ProgressBar progressbar;
+        ListBox lstActivityLog;
 
 
         void Setup_menu()
@@ -87,19 +73,24 @@ namespace ActivitySampling
             Title = "Activity Log";
             ClientSize = new Size(250, 350);
 
+            this.KeyDown += perform_ENTER_default_action;
+
             txtActivity = new TextBox();
+            txtActivity.KeyDown += perform_ENTER_default_action;
 
             this.lstActivityLog = new ListBox();
-            this.lstActivityLog.MouseDoubleClick += (sender, e) => {
-                if (this.lstActivityLog.SelectedIndex >= 0) {
+            this.lstActivityLog.MouseDoubleClick += (sender, e) =>
+            {
+                if (this.lstActivityLog.SelectedIndex >= 0)
+                {
                     var li = (ListItem)this.lstActivityLog.Items[this.lstActivityLog.SelectedIndex];
                     if (li.Tag != null)
                         this.txtActivity.Text = (string)li.Tag;
                 }
             };
 
-            var btnLogActivity = new Button { Text = "Log" };
-            btnLogActivity.Click += (sender, e) => {
+            this.btnLogActivity = new Button { Text = "Log" };
+            this.btnLogActivity.Click += (sender, e) => {
                 var description = this.txtActivity.Text;
 
                 Log_activity(description);
@@ -111,7 +102,8 @@ namespace ActivitySampling
             this.lblProgress = new Label { Text = "00:00:00", TextAlignment = TextAlignment.Center, Height = 13 };
             this.progressbar = new ProgressBar { Height = 10 };
 
-            var layout = new TableLayout {
+            var layout = new TableLayout
+            {
                 Padding = new Padding(10), // padding around cells
                 Spacing = new Size(5, 5), // spacing between each cell
 
@@ -125,6 +117,27 @@ namespace ActivitySampling
                 }
             };
             Content = layout;
+        }
+
+
+        void cmdStart_clicked(object sender, EventArgs e)
+        {
+            var mnu = (MenuItem)sender;
+            var interval_length_sec = (int)((Command)mnu.Command).CommandParameter;
+            this.Notifications_requested(TimeSpan.FromSeconds(interval_length_sec));
+        }
+
+        void cmdStop_clicked(object sender, EventArgs e)
+        {
+            this.Stop_notifications_requested();
+
+            this.mnuStart.Enabled = true;
+            this.cmdStop.Enabled = !this.mnuStart.Enabled;
+        }
+
+        void perform_ENTER_default_action(object s, KeyEventArgs e) {
+	        if (e.Key == Keys.Enter)
+	            btnLogActivity.PerformClick();
         }
 
 
