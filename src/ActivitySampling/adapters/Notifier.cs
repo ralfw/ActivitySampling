@@ -27,11 +27,12 @@ namespace ActivitySampling
             this.timProgress = new UITimer { Interval = 1 };
             this.timProgress.Elapsed += timProgress_elapsed;
 
-            this.notification = new NSUserNotification {
+            this.notification = new NSUserNotification
+            {
                 Title = "What are you working on?",
                 Subtitle = "",
                 InformativeText = "Click for same activity as before.\nOr open window to change it.",
-                SoundName = NSUserNotification.NSUserNotificationDefaultSoundName
+                SoundName = "Tink" //"Tink" od "Submarine" od NSUserNotification.NSUserNotificationDefaultSoundName
             };
             this.Current_activity = "";
 

@@ -120,15 +120,13 @@ namespace ActivitySampling
         }
 
 
-        void cmdStart_clicked(object sender, EventArgs e)
-        {
+        void cmdStart_clicked(object sender, EventArgs e) {
             var mnu = (MenuItem)sender;
             var interval_length_sec = (int)((Command)mnu.Command).CommandParameter;
             this.Notifications_requested(TimeSpan.FromSeconds(interval_length_sec));
         }
 
-        void cmdStop_clicked(object sender, EventArgs e)
-        {
+        void cmdStop_clicked(object sender, EventArgs e) {
             this.Stop_notifications_requested();
 
             this.mnuStart.Enabled = true;
@@ -188,6 +186,7 @@ namespace ActivitySampling
             if (activities.Any()) {
                 var mostRecentDescription = activities.Last().Description;
                 this.txtActivity.Text = mostRecentDescription;
+
                 this.Activity_changed(mostRecentDescription);
             }
         }
