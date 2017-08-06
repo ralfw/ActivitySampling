@@ -28,7 +28,7 @@ namespace ActivitySampling
         void Setup_menu()
         {
             var aboutCommand = new Command { MenuText = "About..." };
-            aboutCommand.Executed += (sender, e) => MessageBox.Show(this, "Activity Sampling v1.0");
+            aboutCommand.Executed += (sender, e) => MessageBox.Show(this, "Activity Sampling v1.0.1.0");
 
             var quitCommand = new Command { MenuText = "Quit", Shortcut = Application.Instance.CommonModifier | Keys.Q };
             quitCommand.Executed += (sender, e) => Application.Instance.Quit();
@@ -133,8 +133,18 @@ namespace ActivitySampling
         }
 
         void perform_ENTER_default_action(object s, KeyEventArgs e) {
-	        if (e.Key == Keys.Enter)
-	            btnLogActivity.PerformClick();
+            if (e.Key == Keys.Enter) {
+                btnLogActivity.PerformClick();
+
+                if (e.Shift) {
+                    var timMin = new UITimer { Interval = 1 };
+                    timMin.Elapsed += (_s, _e) => {
+                        this.WindowState = WindowState.Minimized;
+                        timMin.Stop();
+                    };
+                    timMin.Start();
+                }
+            }
         }
 
 
