@@ -35,7 +35,7 @@ namespace ActivitySampling
 
             var preferencesCommand = new Command { MenuText = "&Preferences...", Shortcut = Application.Instance.CommonModifier | Keys.Comma };
 
-            this.cmdStop = new Command { MenuText = "Stop", Shortcut = Application.Instance.CommonModifier | Keys.T, Enabled = false };
+            this.cmdStop = new Command { MenuText = "Stop", Shortcut = Application.Instance.CommonModifier | Keys.T };
             this.cmdStop.Executed += cmdStop_clicked;
 
             this.mnuStart = new ButtonMenuItem
@@ -121,6 +121,8 @@ namespace ActivitySampling
 
 
         void cmdStart_clicked(object sender, EventArgs e) {
+            this.Stop_notifications_requested();
+
             var mnu = (MenuItem)sender;
             var interval_length_sec = (int)((Command)mnu.Command).CommandParameter;
             this.Notifications_requested(TimeSpan.FromSeconds(interval_length_sec));
@@ -128,9 +130,6 @@ namespace ActivitySampling
 
         void cmdStop_clicked(object sender, EventArgs e) {
             this.Stop_notifications_requested();
-
-            this.mnuStart.Enabled = true;
-            this.cmdStop.Enabled = !this.mnuStart.Enabled;
         }
 
         void perform_ENTER_default_action(object s, KeyEventArgs e) {
@@ -146,9 +145,6 @@ namespace ActivitySampling
 
 
         public void Start_countdown(TimeSpan countdown) {
-            this.mnuStart.Enabled = false;
-            this.cmdStop.Enabled = !this.mnuStart.Enabled;
-
             this.progressbar.MaxValue = (int)countdown.TotalSeconds;
             Update_countdown(countdown);
         }
