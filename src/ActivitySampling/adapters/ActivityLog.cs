@@ -7,7 +7,7 @@ namespace ActivitySampling
 {
     class ActivityLog
     {
-        const string LOG_FILENAME = "activitylog.csv";
+        const string LOG_FILENAME = "activities.log";
 
         readonly string filepath;
 
@@ -20,8 +20,7 @@ namespace ActivitySampling
             File.AppendAllLines(this.filepath, new[] { entry });
         }
 
-        public ActivityDto[] Activities
-        {
+        public ActivityDto[] Activities {
             get {
                 var entries = File.ReadAllLines(this.filepath);
                 return entries.Where(e => !string.IsNullOrWhiteSpace(e)).Select(Parse_entry).ToArray();

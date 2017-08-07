@@ -17,7 +17,7 @@ namespace ActivitySampling.Tests
         [Test()]
         public void Usecase()
         {
-            File.Delete("./ActivityLog.csv");
+            File.Delete("./activities.log");
 
             var sut = new ActivityLog(".");
 

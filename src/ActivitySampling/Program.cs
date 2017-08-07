@@ -15,7 +15,6 @@ namespace ActivitySampling
             var applicationDataFolderPath = Ensure_application_data_folder();
             Logging.Initialize(applicationDataFolderPath);
             Preferences.Initialize(applicationDataFolderPath);
-
             var pref = Preferences.Instance.Read();
 
             var reqHandler = new RequestHandler(pref.ActivityLogPath);

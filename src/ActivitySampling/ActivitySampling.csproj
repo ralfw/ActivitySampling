@@ -58,6 +58,7 @@
     <Compile Include="adapters\Logging.cs" />
     <Compile Include="adapters\Notifier.cs" />
     <Compile Include="adapters\Preferences.cs" />
+    <Compile Include="data\PreferencesDto.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -4,12 +4,6 @@ using System.Web.Script.Serialization;
 
 namespace ActivitySampling
 {
-    class PreferencesDto {
-        public string ActivityLogPath { get; set; }
-        public string Soundname { get; set; }
-    }
-
-
     class Preferences
     {
         public static Preferences Instance { get; private set; }
