@@ -33,7 +33,7 @@ namespace ActivitySampling
             Logging.Log.Append("initialization complete");
 
             // run
-            var activities = reqHandler.Select_activities();
+            var activities = reqHandler.Select_recent_activities(150);
             mainDlg.Display(activities);
             notifier.Start(TimeSpan.FromMinutes(5));
             Logging.Log.Append("running (almost)");

@@ -21,9 +21,13 @@ namespace ActivitySampling
         }
 
 
-        public IEnumerable<ActivityDto> Select_activities()
-        {
+        public ActivityDto[] Select_all_activities() {
             return this.activityLog.Activities.ToArray();
+        }
+
+        public ActivityDto[] Select_recent_activities(int n) {
+            var toSkip = this.activityLog.Activities.Length - n;
+            return this.activityLog.Activities.Skip(toSkip).Take(n).ToArray();
         }
     }
 }

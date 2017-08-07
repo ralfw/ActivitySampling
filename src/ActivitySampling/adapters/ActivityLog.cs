@@ -20,7 +20,7 @@ namespace ActivitySampling
             File.AppendAllLines(this.filepath, new[] { entry });
         }
 
-        public IEnumerable<ActivityDto> Activities
+        public ActivityDto[] Activities
         {
             get {
                 var entries = File.ReadAllLines(this.filepath);
