@@ -96,7 +96,7 @@ namespace ActivitySampling
                 Log_activity(description);
 
                 this.Activity_changed(description);
-                Logging.Log.Append("Activity changed to: " + description);
+                Logging.Instance.Append("Activity changed to: " + description);
             };
 
             this.lblProgress = new Label { Text = "00:00:00", TextAlignment = TextAlignment.Center, Height = 13 };

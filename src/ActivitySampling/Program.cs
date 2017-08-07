@@ -14,9 +14,12 @@ namespace ActivitySampling
 
             var applicationDataFolderPath = Ensure_application_data_folder();
             Logging.Initialize(applicationDataFolderPath);
+            Preferences.Initialize(applicationDataFolderPath);
 
-            var reqHandler = new RequestHandler(applicationDataFolderPath);
-            var notifier = new Notifier();
+            var pref = Preferences.Instance.Read();
+
+            var reqHandler = new RequestHandler(pref.ActivityLogPath);
+            var notifier = new Notifier(pref.Soundname);
 
             // bind
             var mainDlg = new MainDlg();
@@ -30,13 +33,13 @@ namespace ActivitySampling
             notifier.Notification_presented += () => { };
             notifier.Notification_acknowledged += mainDlg.Log_activity;
 
-            Logging.Log.Append("initialization complete");
+            Logging.Instance.Append("initialization complete");
 
             // run
             var activities = reqHandler.Select_recent_activities(150);
             mainDlg.Display(activities);
             notifier.Start(TimeSpan.FromMinutes(5));
-            Logging.Log.Append("running (almost)");
+            Logging.Instance.Append("running (almost)");
 
             app.Run(mainDlg);
 

@@ -20,19 +20,18 @@ namespace ActivitySampling
         TimeSpan countdown;
 
 
-        public Notifier() {
+        public Notifier(string soundname) {
             this.timNotify = new UITimer();
             this.timNotify.Elapsed += timNotify_elapsed;
 
             this.timProgress = new UITimer { Interval = 1 };
             this.timProgress.Elapsed += timProgress_elapsed;
 
-            this.notification = new NSUserNotification
-            {
+            this.notification = new NSUserNotification {
                 Title = "What are you working on?",
                 Subtitle = "",
                 InformativeText = "Click for same activity as before.\nOr open window to change it.",
-                SoundName = "Tink" //"Tink" od "Submarine" od NSUserNotification.NSUserNotificationDefaultSoundName
+                SoundName = soundname.ToLower() == "default" ? NSUserNotification.NSUserNotificationDefaultSoundName : soundname
             };
             this.Current_activity = "";
 
@@ -53,14 +52,14 @@ namespace ActivitySampling
             this.countdown = deliverIn;
             this.timProgress.Start();
 
-            Logging.Log.Append($"notifications started with {deliverIn} interval");
+            Logging.Instance.Append($"notifications started with {deliverIn} interval");
         }
 
         public void Stop() {
             this.timNotify.Stop();
             this.timProgress.Stop();
 
-            Logging.Log.Append("notifications stopped");
+            Logging.Instance.Append("notifications stopped");
         }
 
 
@@ -71,7 +70,7 @@ namespace ActivitySampling
             this.notification.Subtitle = this.Current_activity;
             this.notificationCenter.DeliverNotification(this.notification);
             this.notificationCenter.RemoveAllDeliveredNotifications();
-            Logging.Log.Append($"notification delivered");
+            Logging.Instance.Append($"notification delivered");
 
             this.countdown = TimeSpan.FromSeconds(this.timNotify.Interval);
             this.Notification_scheduled(TimeSpan.FromSeconds(this.timNotify.Interval));

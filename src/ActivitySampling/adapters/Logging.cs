@@ -5,10 +5,10 @@ namespace ActivitySampling
 {
     class Logging
     {
-        public static Logging Log { get; private set; }
+        public static Logging Instance { get; private set; }
 
         public static void Initialize(string applicationDataFolderPath) {
-            Log = new Logging(applicationDataFolderPath);
+            Instance = new Logging(applicationDataFolderPath);
         }
 
 
