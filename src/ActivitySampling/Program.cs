@@ -26,6 +26,7 @@ namespace ActivitySampling
             mainDlg.Notifications_requested += notifier.Start;
             mainDlg.Stop_notifications_requested += notifier.Stop;
             mainDlg.Activity_changed += description => notifier.Current_activity = description;
+            mainDlg.Refresh_requested += Refresh;
 
             notifier.Notification_scheduled += mainDlg.Start_countdown;
             notifier.Countdown += mainDlg.Update_countdown;
@@ -35,14 +36,19 @@ namespace ActivitySampling
             Logging.Instance.Append("initialization complete");
 
             // run
-            var activities = reqHandler.Select_recent_activities(150);
-            mainDlg.Display(activities);
+            Refresh();
             notifier.Start(TimeSpan.FromMinutes(pref.DefaultIntervalMin));
             Logging.Instance.Append("running (almost)");
 
             app.Run(mainDlg);
 
             notifier.Dispose();
+
+
+            void Refresh() {
+                var activities = reqHandler.Select_recent_activities(150);
+                mainDlg.Display(activities);
+            }
         }
 
 

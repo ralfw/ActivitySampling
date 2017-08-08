@@ -13,6 +13,7 @@ namespace ActivitySampling
         public event Action<TimeSpan> Notifications_requested;
         public event Action Stop_notifications_requested;
         public event Action<string> Activity_changed;
+        public event Action Refresh_requested;
 
 
         ButtonMenuItem mnuStart;
@@ -59,12 +60,17 @@ namespace ActivitySampling
                 item.Click += cmdStart_clicked;
             }
 
+
+            var cmdRefresh = new Command { MenuText = "Refresh", Shortcut = Keys.F5 };
+            cmdRefresh.Executed += (sender, e) => this.Refresh_requested();
+
             Menu = new MenuBar() {
                 AboutItem = aboutCommand,
                 //ApplicationItems = {  preferencesCommand },
-                QuitItem = quitCommand
+                QuitItem = quitCommand,
             };
             Menu.Items.Insert(3, new ButtonMenuItem { Text = "Notifications", Items = { this.mnuStart, this.cmdStop } });
+            Menu.Items.Insert(4, new ButtonMenuItem { Text = "View", Items = { cmdRefresh } });
         }
 
 
@@ -181,6 +187,8 @@ namespace ActivitySampling
 
         public void Display(IEnumerable<ActivityDto> activities) {
             var groupedByDay = activities.GroupBy(a => a.Timestamp.ToString("yyyyMMdd")).Reverse();
+
+            this.lstActivityLog.Items.Clear();
             foreach (var g in groupedByDay) {
                 this.lstActivityLog.Items.Add(g.First().Timestamp.ToString("D"));
                 foreach (var a in g.Reverse()) {
