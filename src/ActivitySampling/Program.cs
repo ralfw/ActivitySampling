@@ -37,7 +37,7 @@ namespace ActivitySampling
             // run
             var activities = reqHandler.Select_recent_activities(150);
             mainDlg.Display(activities);
-            notifier.Start(TimeSpan.FromMinutes(5));
+            notifier.Start(TimeSpan.FromMinutes(pref.DefaultIntervalMin));
             Logging.Instance.Append("running (almost)");
 
             app.Run(mainDlg);

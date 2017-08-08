@@ -21,7 +21,8 @@ namespace ActivitySampling
             if (!File.Exists(this.preferencesFilePath)) {
                 var pref = new PreferencesDto { 
                     ActivityLogPath = applicationDataFolderPath,
-                    Soundname = "Tink" // or "Submarine" or "default", "" for none
+                    Soundname = "Tink", // or "Submarine" or "default", "" for none
+                    DefaultIntervalMin = 20
                 };
                 Write(pref);
             }
