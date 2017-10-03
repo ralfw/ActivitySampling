@@ -3,6 +3,7 @@ using NUnit.Framework;
 using ActivitySampling;
 using System.Linq;
 using System.IO;
+using ActivitySampling.adapters.providers;
 
 namespace ActivitySampling.Tests
 {

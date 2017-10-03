@@ -1,8 +1,9 @@
 ﻿using System;
+using ActivitySampling.adapters.providers;
 using Eto.Forms;
 using MonoMac.Foundation;
 
-namespace ActivitySampling
+namespace ActivitySampling.adapters.portals
 {
     class Notifier : IDisposable
     {

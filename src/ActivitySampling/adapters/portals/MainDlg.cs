@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ActivitySampling.adapters.providers;
 using Eto.Drawing;
 using Eto.Forms;
 
-
-namespace ActivitySampling
+namespace ActivitySampling.adapters.portals
 {
     class MainDlg : Form
     {

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using ActivitySampling.adapters.portals;
+using ActivitySampling.adapters.providers;
 using Eto.Forms;
 
 
