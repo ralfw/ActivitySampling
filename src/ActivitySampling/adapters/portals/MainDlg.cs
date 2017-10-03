@@ -36,7 +36,7 @@ namespace ActivitySampling.adapters.portals
 
             var preferencesCommand = new Command { MenuText = "&Preferences...", Shortcut = Application.Instance.CommonModifier | Keys.Comma };
 
-            this.cmdStop = new Command { MenuText = "Stop", Shortcut = Application.Instance.CommonModifier | Keys.T };
+            this.cmdStop = new Command { MenuText = "Stop" };
             this.cmdStop.Executed += cmdStop_clicked;
 
             this.mnuStart = new ButtonMenuItem
@@ -44,12 +44,12 @@ namespace ActivitySampling.adapters.portals
                 Text = "Start",
                 Items = {
                     new Command{MenuText = "5 min",   CommandParameter = 5*60 },
-                    new Command{MenuText = "10 min",  CommandParameter = 10*60 },
+                    new Command{MenuText = "10 min",  CommandParameter = 10*60, Shortcut = Application.Instance.CommonModifier | Keys.D0 },
                     new Command{MenuText = "15 min",  CommandParameter = 15*60 },
-                    new Command{MenuText = "20 min",  CommandParameter = 20*60 },
+                    new Command{MenuText = "20 min",  CommandParameter = 20*60, Shortcut = Application.Instance.CommonModifier | Keys.D1 },
                     new Command{MenuText = "25 min",  CommandParameter = 25*60 },
                     new Command{MenuText = "30 min",  CommandParameter = 30*60 },
-                    new Command{MenuText = "45 min",  CommandParameter = 45*60 },
+                    new Command{MenuText = "45 min",  CommandParameter = 45*60, Shortcut = Application.Instance.CommonModifier | Keys.D2 },
                     new Command{MenuText = "60 min",  CommandParameter = 60*60 },
                     new Command{MenuText = "90 min",  CommandParameter = 90*60 },
                     new Command{MenuText = "120 min", CommandParameter = 120*60 },
