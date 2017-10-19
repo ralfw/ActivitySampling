@@ -1,0 +1,9 @@
+language: csharp
+solution: src/ActivitySampling.sln
+
+install:
+  - nuget restore src/ActivitySampling.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release src/ActivitySampling.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe src/ActivitySampling.Tests/bin/Release/ActivitySampling.Tests.dll
